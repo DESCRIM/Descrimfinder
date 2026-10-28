@@ -1,138 +1,106 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Video Client Finder</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EditFind — Client Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <div class="brand"><div class="logo">V</div><div><h1>Video Client Finder</h1><p>Поиск заказов и потенциальных клиентов на видеомонтаж</p></div></div>
-    <div class="pill">● Бесплатная версия</div>
-  </header>
-
-  <section class="hero">
-    <div class="hero-card">
-      <div class="eyebrow">Твоя панель поиска клиентов</div>
-      <h2>Находи проекты.<br>Собирай свою базу.</h2>
-      <p>Рабочее пространство для поиска заказов на монтаж, изучения каналов авторов и ведения общения с потенциальными клиентами — без платных сервисов и автоматической рассылки.</p>
-      <div class="hero-actions"><button class="primary" onclick="switchTab('search')">Начать поиск ↗</button><button onclick="openLeadModal()">＋ Добавить клиента</button></div>
-    </div>
-    <div class="stats">
-      <div class="stat"><div class="num" id="statTotal">0</div><div class="cap">В базе клиентов</div><div class="hint">Все сохранённые лиды</div></div>
-      <div class="stat"><div class="num" id="statNew">0</div><div class="cap">Новые</div><div class="hint">Ждут первого контакта</div></div>
-      <div class="stat"><div class="num" id="statContacted">0</div><div class="cap">В работе</div><div class="hint">Написал или получил ответ</div></div>
-      <div class="stat"><div class="num" id="statWon">0</div><div class="cap">Заказы получены</div><div class="hint">Твои результаты</div></div>
-    </div>
-  </section>
-
-  <nav class="tabs">
-    <button class="tab active" data-tab="search" onclick="switchTab('search')">⌕ Поиск клиентов</button>
-    <button class="tab" data-tab="leads" onclick="switchTab('leads')">▤ База клиентов</button>
-    <button class="tab" data-tab="templates" onclick="switchTab('templates')">✉ Сообщения</button>
-    <button class="tab" data-tab="guide" onclick="switchTab('guide')">ⓘ Как пользоваться</button>
-  </nav>
-
-  <section class="view active" id="view-search">
-    <div class="search-layout">
-      <div class="panel">
-        <h3>Сценарии поиска</h3>
-        <div class="preset-list" id="presetList"></div>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo"><div class="logo-icon">E</div><span>EditFind</span></div>
+    <nav class="navigation">
+      <p class="nav-label">WORKSPACE</p>
+      <button class="nav-item active"><span>⌂</span>Dashboard</button>
+      <button class="nav-item"><span>⌕</span>Find clients</button>
+      <button class="nav-item"><span>◉</span>Leads <span class="nav-count">24</span></button>
+      <button class="nav-item"><span>✉</span>Outreach</button>
+      <p class="nav-label second">ANALYTICS</p>
+      <button class="nav-item"><span>↗</span>Analytics</button>
+      <button class="nav-item"><span>⚙</span>Settings</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="upgrade-card">
+        <div class="upgrade-icon">✦</div>
+        <strong>Go Pro</strong>
+        <p>Find more clients with unlimited searches.</p>
+        <button>Upgrade →</button>
       </div>
-      <div class="panel">
-        <h3 id="searchTitle">Найди заказчиков на монтаж</h3>
-        <p class="muted" id="searchDesc">Выбери сценарий слева, затем открой поиск в подходящем источнике.</p>
-        <div class="grid2">
-          <div><label for="sourceSelect">Площадка</label><select id="sourceSelect"></select></div>
-          <div><label for="languageSelect">Язык запросов</label><select id="languageSelect"><option value="en">Английский — больше международных результатов</option><option value="ru">Русский</option><option value="mix">Смешанный</option></select></div>
+      <div class="user"><div class="avatar">A</div><div><strong>Alexander</strong><small>Free plan</small></div><span class="dots">•••</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="mobile-logo"><div class="logo-icon">E</div>EditFind</div>
+      <div class="topbar-right"><button class="icon-button">?</button><button class="notification">♢<span></span></button><div class="top-avatar">A</div></div>
+    </header>
+
+    <section class="content">
+      <div class="welcome">
+        <div>
+          <p class="eyebrow">CLIENT FINDER</p>
+          <h1>Find your next <span>client.</span></h1>
+          <p class="subtitle">Let EditFind discover creators and businesses that need a video editor.</p>
         </div>
-        <div style="margin-top:12px"><label for="queryInput">Поисковый запрос (можно изменить)</label><input id="queryInput" value="freelance video editor needed"></div>
-        <div class="searchlinks" id="searchLinks"></div>
-        <div class="note">Результаты открываются на исходных сайтах. Просмотри объявление или канал, проверь актуальность и добавляй только подходящих потенциальных клиентов. Сайт не обходит авторизацию, CAPTCHA или ограничения платформ.</div>
-        <div class="panel" style="background:#0b1427;margin:18px 0 0;padding:15px">
-          <h3 style="font-size:15px">Быстрый поиск по своей идее</h3>
-          <div class="row"><input id="customQuery" placeholder="Например: podcast editor wanted"><button class="primary" onclick="runCustomSearch()">Искать</button></div>
+        <div class="live-status"><span class="live-dot"></span>Autopilot is ready</div>
+      </div>
+
+      <section class="search-card">
+        <div class="search-card-header">
+          <div><h2>Find potential clients</h2><p>Tell us who you want to work with.</p></div>
+          <div class="ai-badge">✦ AI powered</div>
         </div>
-      </div>
-    </div>
-  </section>
+        <div class="filters">
+          <div class="filter"><label>CLIENT TYPE</label><select id="clientType"><option>YouTube creators</option><option>Podcasters</option><option>Businesses</option><option>Coaches</option></select></div>
+          <div class="filter"><label>MIN. AUDIENCE</label><select><option>10,000+</option><option>50,000+</option><option>100,000+</option></select></div>
+          <div class="filter"><label>LANGUAGE</label><select><option>English</option><option>German</option><option>Russian</option><option>Spanish</option></select></div>
+          <button class="search-button" id="searchButton"><span>⌕</span>Find clients</button>
+        </div>
+      </section>
 
-  <section class="view" id="view-leads">
-    <div class="panel">
-      <div class="toolbar">
-        <div><h3 style="margin-bottom:3px">Твоя база потенциальных клиентов</h3><div class="muted tiny">Данные сохраняются локально в этом браузере.</div></div>
-        <div class="toolbar-left"><button class="primary" onclick="openLeadModal()">＋ Добавить клиента</button><button onclick="exportCSV()">Экспорт CSV</button><button onclick="importCSV()">Импорт CSV</button><button class="danger" onclick="clearLeads()">Очистить базу</button></div>
-      </div>
-      <div class="grid3" style="margin-bottom:14px">
-        <div><label>Поиск в базе</label><input id="filterText" placeholder="Имя, канал, ниша..." oninput="renderLeads()"></div>
-        <div><label>Статус</label><select id="filterStatus" onchange="renderLeads()"><option value="">Все статусы</option><option>Новый</option><option>Проверить</option><option>Написал</option><option>Ответил</option><option>Обсуждение</option><option>Заказ получен</option><option>Не подходит</option></select></div>
-        <div><label>Источник</label><select id="filterSource" onchange="renderLeads()"><option value="">Все источники</option><option>YouTube</option><option>Google</option><option>Upwork</option><option>Fiverr</option><option>Reddit</option><option>Contra</option><option>LinkedIn</option><option>Другое</option></select></div>
-      </div>
-      <div class="table-wrap"><table><thead><tr><th>Клиент / канал</th><th>Источник</th><th>Ниша</th><th>Статус</th><th>Контакт / ссылка</th><th>Действия</th></tr></thead><tbody id="leadRows"></tbody></table><div id="emptyState" class="empty">Пока нет клиентов. Найди первый заказ или добавь потенциального клиента вручную.</div></div>
-    </div>
-  </section>
+      <section class="stats">
+        <div class="stat-card"><div class="stat-top"><span>Leads found</span><div class="stat-icon purple">◉</div></div><strong id="leadsFound">247</strong><small><b>+18%</b> this week</small></div>
+        <div class="stat-card"><div class="stat-top"><span>High intent</span><div class="stat-icon green">↗</div></div><strong id="highIntent">34</strong><small><b>+12%</b> this week</small></div>
+        <div class="stat-card"><div class="stat-top"><span>Emails found</span><div class="stat-icon blue">✉</div></div><strong id="emailsFound">18</strong><small><b>+7%</b> this week</small></div>
+        <div class="stat-card"><div class="stat-top"><span>Response rate</span><div class="stat-icon orange">%</div></div><strong>24.8%</strong><small><b>+3.4%</b> this week</small></div>
+      </section>
 
-  <section class="view" id="view-templates">
-    <div class="grid2">
-      <div class="panel"><h3>Сообщение блогеру</h3><p class="muted tiny">Ссылайся на конкретное видео и объясняй, чем будешь полезен.</p><textarea class="template" id="templateCreator">Привет! Посмотрел(а) твой канал и особенно понравилось [конкретное видео/момент].
-
-Я занимаюсь видеомонтажом и могу помочь с [длинными роликами / Shorts / нарезками / субтитрами]. Если актуально, могу прислать примеры работ и предложить идею для одного из следующих видео.
-
-Портфолио: [ссылка]
-
-Хорошего дня!</textarea><button style="margin-top:10px" onclick="copyTemplate('templateCreator')">Копировать сообщение</button></div>
-      <div class="panel"><h3>Отклик на объявление</h3><p class="muted tiny">Подстраивай текст под требования конкретного проекта.</p><textarea class="template" id="templateJob">Здравствуйте! Увидел(а) ваше объявление о поиске видеомонтажёра.
-
-Могу помочь с [конкретная задача из объявления]. Работаю с [инструменты/форматы, если уместно].
-
-Примеры работ: [ссылка на портфолио]
-
-Подскажите, пожалуйста, какой объём и сроки планируются?</textarea><button style="margin-top:10px" onclick="copyTemplate('templateJob')">Копировать сообщение</button></div>
-    </div>
-    <div class="panel"><h3>Короткое деловое сообщение</h3><textarea class="template" id="templateShort">Здравствуйте! Я видеомонтажёр, специализируюсь на [тип видео].
-
-Заметил(а), что вы регулярно публикуете видео на тему [тема]. Могу помочь с монтажом и подготовкой коротких нарезок.
-
-Портфолио: [ссылка]. Если это интересно, буду рад(а) обсудить задачу.</textarea><button style="margin-top:10px" onclick="copyTemplate('templateShort')">Копировать сообщение</button><div class="note">Отправляй сообщения вручную, персонализируй каждое и уважай просьбу не связываться повторно.</div></div>
-  </section>
-
-  <section class="view" id="view-guide">
-    <div class="panel"><h3>Как получить пользу от приложения</h3>
-      <div class="grid2">
-        <div><h3>1. Ищи регулярно</h3><p class="muted">Проверяй новые объявления на площадках с заказами. Для блогеров ищи активные каналы, которые публикуют регулярно, но не всегда делают Shorts или качественные нарезки.</p></div>
-        <div><h3>2. Проверяй качество лида</h3><p class="muted">Смотри на дату объявления, частоту публикаций, качество монтажа, доступность делового контакта и явную потребность в помощи.</p></div>
-        <div><h3>3. Записывай контекст</h3><p class="muted">Сохраняй ссылку на профиль или заказ, источник, тип монтажа и конкретную причину, почему ты выбрал этого клиента.</p></div>
-        <div><h3>4. Пиши персонально</h3><p class="muted">Ссылайся на конкретный проект, показывай релевантное портфолио и предлагай понятный следующий шаг. Не делай массовую рассылку.</p></div>
-      </div>
-    </div>
-    <div class="panel"><h3>Что важно знать</h3><ul class="muted"><li>Это браузерный прототип. База хранится в localStorage этого браузера и устройства, не в облаке.</li><li>Для переноса данных используй экспорт CSV и храни резервную копию.</li><li>Поисковые ссылки и доступность результатов могут меняться; некоторые площадки требуют входа или имеют свои правила.</li><li>Автоматический сбор данных пока не подключён. Для следующей версии можно добавить официальные API, где они доступны и разрешены.</li><li>Сохраняй только необходимые публичные деловые данные и соблюдай правила платформ и применимые законы о приватности.</li></ul></div>
-  </section>
-  <footer class="footer">Video Client Finder · Бесплатный браузерный прототип · Данные остаются в твоём браузере</footer>
+      <section class="leads-section">
+        <div class="section-header"><div><h2>Recommended leads</h2><p>Potential clients matched to your profile.</p></div><button class="view-all">View all →</button></div>
+        <div class="leads-table">
+          <div class="table-head"><span>CLIENT</span><span>PLATFORM</span><span>AUDIENCE</span><span>OPPORTUNITY</span><span>SCORE</span><span></span></div>
+          <div id="leadList"></div>
+        </div>
+      </section>
+    </section>
+  </main>
 </div>
 
-<div class="modal" id="leadModal" role="dialog" aria-modal="true">
-  <div class="modal-card">
-    <div class="modal-head"><h3 id="modalTitle">Добавить клиента</h3><button onclick="closeLeadModal()">✕</button></div>
-    <form id="leadForm">
-      <div class="form-grid">
-        <div><label for="leadName">Имя / компания / канал *</label><input id="leadName" required maxlength="180"></div>
-        <div><label for="leadSource">Источник</label><select id="leadSource"><option>YouTube</option><option>Google</option><option>Upwork</option><option>Fiverr</option><option>Reddit</option><option>Contra</option><option>LinkedIn</option><option>Другое</option></select></div>
-        <div class="full"><label for="leadUrl">Ссылка на профиль или объявление</label><input id="leadUrl" type="url" placeholder="https://..."></div>
-        <div><label for="leadContact">Публичный деловой контакт</label><input id="leadContact" placeholder="Email / форма контакта"></div>
-        <div><label for="leadNiche">Ниша / тип монтажа</label><input id="leadNiche" placeholder="YouTube, Reels, подкаст..."></div>
-        <div><label for="leadStatus">Статус</label><select id="leadStatus"><option>Новый</option><option>Проверить</option><option>Написал</option><option>Ответил</option><option>Обсуждение</option><option>Заказ получен</option><option>Не подходит</option></select></div>
-        <div><label for="leadScore">Перспективность (твоя оценка)</label><select id="leadScore"><option>Не оценено</option><option>Высокая</option><option>Средняя</option><option>Низкая</option></select></div>
-        <div class="full"><label for="leadNotes">Заметки: почему подходит, дата объявления, следующий шаг</label><textarea id="leadNotes" rows="3"></textarea></div>
-      </div>
-      <div class="modal-actions"><button type="button" onclick="closeLeadModal()">Отмена</button><button class="primary" type="submit">Сохранить</button></div>
-    </form>
+<div class="modal" id="scanModal">
+  <div class="modal-box">
+    <button class="close-modal" id="closeModal">×</button>
+    <div class="scan-icon">✦</div>
+    <h2 id="scanTitle">Finding clients...</h2>
+    <p id="scanText">Scanning the web for potential clients.</p>
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="scan-percent"><span id="progressPercent">0%</span><span>AI search</span></div>
+    <div class="scan-steps">
+      <div class="scan-step active"><span>✓</span>Searching creators</div>
+      <div class="scan-step"><span>○</span>Analyzing activity</div>
+      <div class="scan-step"><span>○</span>Finding editing opportunities</div>
+      <div class="scan-step"><span>○</span>Ranking leads</div>
+    </div>
   </div>
 </div>
-<input type="file" id="csvFile" accept=".csv,text/csv" hidden>
-<div class="toast" id="toast"></div>
 
-<script src="script.js" defer></script>
+<div class="modal" id="leadModal">
+  <div class="lead-modal"><button class="close-modal" id="closeLeadModal">×</button><div id="leadDetails"></div></div>
+</div>
+<script src="script.js"></script>
 </body>
 </html>

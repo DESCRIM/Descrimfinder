@@ -1,71 +1,76 @@
-const PRESETS = [
- {title:"Свежие заказы на монтаж",desc:"Ищи людей и компании, которые прямо сейчас ищут видеомонтажёра.",en:'"video editor" OR "video editing" freelance job',ru:'"видеомонтажёр" OR "видеомонтаж" ищу монтажёра заказ',category:"orders"},
- {title:"YouTube-монтаж",desc:"Объявления о монтаже длинных видео для YouTube.",en:'"YouTube editor" OR "YouTube video editor" hiring freelance',ru:'ищу монтажёра YouTube видео заказ',category:"orders"},
- {title:"Shorts / Reels / TikTok",desc:"Короткие вертикальные ролики, нарезки и субтитры.",en:'"short form video editor" OR "Reels editor" freelance',ru:'монтаж Shorts Reels TikTok ищу монтажёра',category:"orders"},
- {title:"Подкасты и интервью",desc:"Монтаж подкастов, нарезки эпизодов и клипы для соцсетей.",en:'"podcast video editor" freelance hiring',ru:'монтаж видеоподкаста ищу монтажёра заказ',category:"orders"},
- {title:"Реклама и бизнес-видео",desc:"Рекламные ролики, промо и контент для компаний.",en:'"video editor" "looking for" freelance ads',ru:'ищем видеомонтажёра реклама проморолик',category:"orders"},
- {title:"Блогеры и авторы",desc:"Ищи активных авторов с регулярными публикациями и публичными бизнес-контактами.",en:'YouTube creator weekly videos business contact',ru:'YouTube блогер регулярно выпускает видео контакты для сотрудничества',category:"creators"},
- {title:"Стримеры и игровые каналы",desc:"Потенциальные клиенты для нарезок стримов, хайлайтов и Shorts.",en:'streamer YouTube highlights editor creator',ru:'стример нарезки хайлайты монтаж видео',category:"creators"},
- {title:"Подкастеры и эксперты",desc:"Авторы, которые публикуют длинные беседы и могут использовать короткие клипы.",en:'podcast host interview channel video clips',ru:'подкаст интервью эксперт канал видеонарезки',category:"creators"}
+const leads=[
+{name:"Jake Miller",handle:"@jakemiller",type:"YouTube Creator",platform:"YouTube",audience:"128K",opportunity:"Posts 3 videos/week",score:96,email:"jake@example.com",description:"Jake publishes high-frequency educational videos. His recent uploads show strong growth but inconsistent editing quality."},
+{name:"Alex Carter",handle:"@alexcarter",type:"Podcast",platform:"YouTube",audience:"84K",opportunity:"Long-form podcast",score:92,email:"alex@example.com",description:"Alex runs a growing business podcast. Episodes are long-form and could benefit from short-form clips and professional editing."},
+{name:"GrowthLab",handle:"@growthlab",type:"Business",platform:"Instagram",audience:"62K",opportunity:"Needs Reels",score:89,email:"hello@growthlab.example",description:"GrowthLab publishes educational business content and appears to be increasing their short-form video output."},
+{name:"Daniel Brooks",handle:"@danielbrooks",type:"Creator",platform:"YouTube",audience:"47K",opportunity:"Weekly uploads",score:87,email:"daniel@example.com",description:"Daniel is consistently uploading videos but has limited editing complexity, creating a strong opportunity for an editor."},
+{name:"Mia Thompson",handle:"@miathompson",type:"Coach",platform:"Instagram",audience:"31K",opportunity:"Daily content",score:84,email:"mia@example.com",description:"Mia produces frequent educational content and could benefit from outsourcing video editing."}
 ];
-const SOURCES = {
- "Google": q => "https://www.google.com/search?q="+encodeURIComponent(q),
- "YouTube": q => "https://www.youtube.com/results?search_query="+encodeURIComponent(q),
- "Reddit": q => "https://www.reddit.com/search/?q="+encodeURIComponent(q),
- "Upwork": q => "https://www.upwork.com/nx/search/jobs/?q="+encodeURIComponent(q),
- "Fiverr": q => "https://www.fiverr.com/search/gigs?query="+encodeURIComponent(q),
- "Contra": q => "https://contra.com/search?query="+encodeURIComponent(q),
- "LinkedIn": q => "https://www.linkedin.com/search/results/content/?keywords="+encodeURIComponent(q)
-};
-const STORAGE_KEY = "vcf_leads_v1";
-let leads = loadLeads(), selectedPreset = 0, editingId = null;
-function loadLeads(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]")}catch(e){return []}}
-function saveLeads(){localStorage.setItem(STORAGE_KEY,JSON.stringify(leads));updateStats();renderLeads()}
-function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function safeUrl(s){try{let u=new URL(s);return ["http:","https:"].includes(u.protocol)?u.href:""}catch(e){return ""}}
-function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
-function switchTab(name){document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id==="view-"+name));document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.tab===name));if(name==="leads")renderLeads()}
-function initSearch(){
- const list=document.getElementById("presetList");
- list.innerHTML=PRESETS.map((p,i)=>`<button class="preset ${i===selectedPreset?'selected':''}" onclick="selectPreset(${i})">${esc(p.title)}<small>${p.category==="orders"?"Площадки с заказами":"Поиск авторов"}</small></button>`).join("");
- const source=document.getElementById("sourceSelect");source.innerHTML=Object.keys(SOURCES).map(x=>`<option>${esc(x)}</option>`).join("");source.value="Google";source.addEventListener("change",renderSearchLinks);
- selectPreset(0);
+
+const leadList=document.getElementById("leadList"),searchButton=document.getElementById("searchButton"),scanModal=document.getElementById("scanModal"),leadModal=document.getElementById("leadModal"),closeModal=document.getElementById("closeModal"),closeLeadModal=document.getElementById("closeLeadModal"),progressBar=document.getElementById("progressBar"),progressPercent=document.getElementById("progressPercent"),scanTitle=document.getElementById("scanTitle"),scanText=document.getElementById("scanText"),leadsFound=document.getElementById("leadsFound"),highIntent=document.getElementById("highIntent"),emailsFound=document.getElementById("emailsFound");
+
+renderLeads(leads.slice(0,4));
+
+function getInitials(name){return name.split(" ").map(w=>w[0]).join("").substring(0,2).toUpperCase()}
+
+function renderLeads(data){
+ leadList.innerHTML="";
+ data.forEach((lead,index)=>{
+  const row=document.createElement("div");
+  row.className="lead-row"; row.style.animationDelay=`${index*70}ms`;
+  row.innerHTML=`<div class="client"><div class="client-avatar">${getInitials(lead.name)}</div><div class="client-info"><strong>${lead.name}</strong><small>${lead.handle}</small></div></div><div class="platform">${lead.platform}</div><div class="audience">${lead.audience}</div><div class="opportunity">${lead.opportunity}</div><div><span class="score">${lead.score}%</span></div><button class="more" onclick="openLead(${index})">⋯</button>`;
+  leadList.appendChild(row);
+ });
 }
-function selectPreset(i){selectedPreset=i;document.querySelectorAll(".preset").forEach((x,j)=>x.classList.toggle("selected",j===i));const p=PRESETS[i];document.getElementById("searchTitle").textContent=p.title;document.getElementById("searchDesc").textContent=p.desc;updateQuery();renderSearchLinks()}
-function updateQuery(){const lang=document.getElementById("languageSelect").value;const p=PRESETS[selectedPreset];document.getElementById("queryInput").value=lang==="ru"?p.ru:lang==="mix"?p.en+" "+p.ru:p.en}
-function renderSearchLinks(){const q=document.getElementById("queryInput").value.trim();const source=document.getElementById("sourceSelect").value;document.getElementById("searchLinks").innerHTML=`<a target="_blank" rel="noopener noreferrer" href="${SOURCES[source](q)}">Открыть поиск в ${esc(source)} ↗</a>`+Object.keys(SOURCES).filter(s=>s!==source).map(s=>`<a target="_blank" rel="noopener noreferrer" href="${SOURCES[s](q)}">${esc(s)} ↗</a>`).join("")}
-document.addEventListener("input",e=>{if(e.target.id==="queryInput")renderSearchLinks()});
-document.getElementById("languageSelect").addEventListener("change",()=>{updateQuery();renderSearchLinks()});
-function runCustomSearch(){const q=document.getElementById("customQuery").value.trim();if(!q){showToast("Сначала введи поисковый запрос");return}window.open(SOURCES[document.getElementById("sourceSelect").value](q),"_blank","noopener")}
-function updateStats(){document.getElementById("statTotal").textContent=leads.length;document.getElementById("statNew").textContent=leads.filter(x=>x.status==="Новый"||x.status==="Проверить").length;document.getElementById("statContacted").textContent=leads.filter(x=>["Написал","Ответил","Обсуждение"].includes(x.status)).length;document.getElementById("statWon").textContent=leads.filter(x=>x.status==="Заказ получен").length}
-function renderLeads(){
- const text=(document.getElementById("filterText")?.value||"").toLowerCase(),status=document.getElementById("filterStatus")?.value||"",source=document.getElementById("filterSource")?.value||"";
- const rows=leads.filter(l=>(!text||[l.name,l.niche,l.contact,l.notes,l.source,l.url].join(" ").toLowerCase().includes(text))&&(!status||l.status===status)&&(!source||l.source===source));
- const tbody=document.getElementById("leadRows");tbody.innerHTML=rows.map(l=>`<tr><td><strong>${esc(l.name)}</strong><div class="muted tiny">${esc(l.notes||"")}</div>${l.score&&l.score!=="Не оценено"?`<div class="tiny" style="color:var(--green);margin-top:5px">Оценка: ${esc(l.score)}</div>`:""}</td><td>${esc(l.source)}</td><td>${esc(l.niche||"—")}</td><td><span class="status" data-s="${esc(l.status)}">${esc(l.status)}</span></td><td>${l.url?`<a href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer" style="color:#b8c8ff">Профиль ↗</a>`:"—"}<div class="tiny muted">${esc(l.contact||"")}</div></td><td><div class="actions"><button onclick="editLead('${l.id}')">Изменить</button><button onclick="advanceLead('${l.id}')">Статус →</button><button class="danger" onclick="deleteLead('${l.id}')">Удалить</button></div></td></tr>`).join("");
- document.getElementById("emptyState").style.display=rows.length?"none":"block";
+
+searchButton.addEventListener("click",startSearch);
+
+function startSearch(){
+ searchButton.classList.add("loading"); scanModal.classList.add("show");
+ let progress=0,currentStep=0;
+ const steps=document.querySelectorAll(".scan-step");
+ steps.forEach(s=>s.classList.remove("active","done"));
+ const interval=setInterval(()=>{
+  progress+=Math.floor(Math.random()*4)+1;if(progress>100)progress=100;
+  progressBar.style.width=`${progress}%`;progressPercent.textContent=`${progress}%`;
+  const stepIndex=Math.min(Math.floor(progress/25),3);
+  if(stepIndex!==currentStep){
+   if(steps[currentStep]){steps[currentStep].classList.remove("active");steps[currentStep].classList.add("done");steps[currentStep].querySelector("span").textContent="✓"}
+   currentStep=stepIndex;
+   if(steps[currentStep]){steps[currentStep].classList.add("active");steps[currentStep].querySelector("span").textContent="●"}
+  }
+  if(progress<25){scanTitle.textContent="Finding clients...";scanText.textContent="Scanning creators and businesses."}
+  else if(progress<50){scanTitle.textContent="Analyzing activity...";scanText.textContent="Looking for signs they need an editor."}
+  else if(progress<75){scanTitle.textContent="Finding opportunities...";scanText.textContent="Matching leads to your profile."}
+  else{scanTitle.textContent="Ranking leads...";scanText.textContent="Calculating client potential."}
+  if(progress>=100){clearInterval(interval);setTimeout(finishSearch,700)}
+ },100);
 }
-function openLeadModal(id=null){
- editingId=id;const l=id?leads.find(x=>x.id===id):null;document.getElementById("modalTitle").textContent=l?"Изменить клиента":"Добавить клиента";
- const vals={leadName:l?.name||"",leadSource:l?.source||"YouTube",leadUrl:l?.url||"",leadContact:l?.contact||"",leadNiche:l?.niche||"",leadStatus:l?.status||"Новый",leadScore:l?.score||"Не оценено",leadNotes:l?.notes||""};
- Object.entries(vals).forEach(([k,v])=>document.getElementById(k).value=v);
- document.getElementById("leadModal").classList.add("open");document.getElementById("leadName").focus();
+
+function finishSearch(){
+ scanModal.classList.remove("show");searchButton.classList.remove("loading");progressBar.style.width="0%";progressPercent.textContent="0%";generateNewLead();
 }
-function closeLeadModal(){document.getElementById("leadModal").classList.remove("open")}
-document.getElementById("leadForm").addEventListener("submit",e=>{
- e.preventDefault();const url=document.getElementById("leadUrl").value.trim();if(url&&!safeUrl(url)){showToast("Ссылка должна начинаться с http:// или https://");return}
- const obj={id:editingId||String(Date.now())+Math.random().toString(16).slice(2,6),name:document.getElementById("leadName").value.trim(),source:document.getElementById("leadSource").value,url,contact:document.getElementById("leadContact").value.trim(),niche:document.getElementById("leadNiche").value.trim(),status:document.getElementById("leadStatus").value,score:document.getElementById("leadScore").value,notes:document.getElementById("leadNotes").value.trim(),updatedAt:new Date().toISOString()};
- if(editingId)leads=leads.map(x=>x.id===editingId?obj:x);else leads.unshift(obj);
- saveLeads();closeLeadModal();showToast(editingId?"Клиент обновлён":"Клиент сохранён");
-});
-function editLead(id){openLeadModal(id)}
-function deleteLead(id){const l=leads.find(x=>x.id===id);if(!l)return;if(confirm(`Удалить «${l.name}» из базы?`)){leads=leads.filter(x=>x.id!==id);saveLeads();showToast("Запись удалена")}}
-function advanceLead(id){const statuses=["Новый","Проверить","Написал","Ответил","Обсуждение","Заказ получен","Не подходит"];const l=leads.find(x=>x.id===id);if(!l)return;l.status=statuses[(statuses.indexOf(l.status)+1)%statuses.length];saveLeads();showToast("Статус: "+l.status)}
-function clearLeads(){if(!leads.length){showToast("База уже пуста");return}if(confirm("Удалить все записи? Рекомендуем сначала экспортировать CSV.")){leads=[];saveLeads();showToast("База очищена")}}
-function exportCSV(){if(!leads.length){showToast("Нет записей для экспорта");return}const cols=["name","source","url","contact","niche","status","score","notes","updatedAt"];const labels=["Имя/канал","Источник","Ссылка","Публичный контакт","Ниша","Статус","Оценка","Заметки","Обновлено"];const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';const csv=[labels,...leads.map(l=>cols.map(k=>l[k]||""))].map(row=>row.map(q).join(";")).join("\r\n");const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="video_clients.csv";a.click();URL.revokeObjectURL(a.href);showToast("Экспорт готов")}
-function importCSV(){document.getElementById("csvFile").click()}
-document.getElementById("csvFile").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;const text=await f.text();const lines=text.replace(/^\ufeff/,"").split(/\r?\n/).filter(Boolean);if(lines.length<2){showToast("В CSV нет записей");return}const parse=line=>{let a=[],cur="",q=false;for(let i=0;i<line.length;i++){let c=line[i];if(c==='"'&&line[i+1]==='"'&&q){cur+='"';i++}else if(c==='"')q=!q;else if((c===";"||c===",")&&!q){a.push(cur);cur=""}else cur+=c}a.push(cur);return a};const head=parse(lines[0]).map(x=>x.trim().toLowerCase());const get=(r,...names)=>{let i=head.findIndex(h=>names.includes(h));return i>=0?(r[i]||""):""};let count=0;for(const line of lines.slice(1)){const r=parse(line);const name=get(r,"имя/канал","имя/компания/канал","name");if(!name)continue;leads.push({id:String(Date.now())+Math.random().toString(16).slice(2),name,source:get(r,"источник","platform")||"Другое",url:get(r,"ссылка","url"),contact:get(r,"публичный контакт","contact"),niche:get(r,"ниша","niche"),status:get(r,"статус","status")||"Новый",score:get(r,"оценка","score")||"Не оценено",notes:get(r,"заметки","notes"),updatedAt:new Date().toISOString()});count++}saveLeads();e.target.value="";showToast(`Импортировано записей: ${count}`)});
-function copyTemplate(id){const el=document.getElementById(id);if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(el.value).then(()=>showToast("Сообщение скопировано")).catch(()=>fallbackCopy(el))}else fallbackCopy(el)}
-function fallbackCopy(el){el.select();try{document.execCommand("copy");showToast("Сообщение скопировано")}catch(e){showToast("Выдели текст и скопируй вручную")}}
-document.getElementById("leadModal").addEventListener("click",e=>{if(e.target.id==="leadModal")closeLeadModal()});
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeLeadModal()});
-initSearch();updateStats();renderLeads();
+
+function generateNewLead(){
+ const name=randomName();
+ const newLead={name,handle:"@"+name.toLowerCase().replace(" ",""),type:"YouTube Creator",platform:"YouTube",audience:Math.floor(Math.random()*150+20)+"K",opportunity:randomOpportunity(),score:Math.floor(Math.random()*13)+86,email:"hello@creator.example",description:"This lead was recently discovered by EditFind AI. Their content frequency and audience growth indicate a potential need for professional video editing."};
+ leads.unshift(newLead);renderLeads(leads.slice(0,5));
+ leadsFound.textContent=parseInt(leadsFound.textContent)+Math.floor(Math.random()*8)+3;
+ highIntent.textContent=parseInt(highIntent.textContent)+1;
+ emailsFound.textContent=parseInt(emailsFound.textContent)+1;
+}
+
+function randomName(){return ["Noah Wilson","Ethan Walker","Lucas Martin","Oliver Stone","Ryan Cooper","Chris Morgan","Liam Parker","James Taylor"][Math.floor(Math.random()*8)]}
+function randomOpportunity(){return ["3 uploads/week","Needs short clips","Growing channel","Long-form content","Daily content","Podcast editing"][Math.floor(Math.random()*6)]}
+
+function openLead(index){
+ const lead=leads[index];
+ document.getElementById("leadDetails").innerHTML=`<div class="detail-top"><div class="detail-avatar">${getInitials(lead.name)}</div><div><h2>${lead.name}</h2><p>${lead.handle} · ${lead.type}</p></div><div class="detail-score">${lead.score}% match</div></div><div class="detail-grid"><div class="detail-stat"><small>PLATFORM</small><strong>${lead.platform}</strong></div><div class="detail-stat"><small>AUDIENCE</small><strong>${lead.audience}</strong></div><div class="detail-stat"><small>EMAIL</small><strong>${lead.email}</strong></div><div class="detail-stat"><small>OPPORTUNITY</small><strong>${lead.opportunity}</strong></div></div><div class="detail-opportunity"><strong>Why this lead?</strong><br><br>${lead.description}</div><div class="detail-actions"><button class="primary-action" onclick="generatePitch('${lead.name}')">✦ Generate pitch</button><button class="secondary-action" onclick="copyEmail('${lead.email}')">Copy email</button></div>`;
+ leadModal.classList.add("show");
+}
+
+function generatePitch(name){alert(`AI pitch generated for ${name}!\n\nHey ${name.split(" ")[0]},\n\nI watched some of your recent content and really liked your style. I noticed there is a lot of potential to make your videos even more engaging through tighter editing, pacing and short-form clips.\n\nI'd love to help with that.`)}
+function copyEmail(email){navigator.clipboard.writeText(email);alert("Email copied: "+email)}
+closeModal.addEventListener("click",()=>scanModal.classList.remove("show"));
+closeLeadModal.addEventListener("click",()=>leadModal.classList.remove("show"));
+window.addEventListener("click",e=>{if(e.target===scanModal)scanModal.classList.remove("show");if(e.target===leadModal)leadModal.classList.remove("show")});
+document.querySelectorAll(".nav-item").forEach(item=>item.addEventListener("click",()=>{document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));item.classList.add("active")}));
