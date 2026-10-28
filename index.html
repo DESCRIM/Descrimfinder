@@ -1,106 +1,151 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EditFind — Client Finder</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0d0e14" />
+  <meta name="description" content="ClipFinder — поиск потенциальных клиентов для видеомонтажёров." />
+  <title>ClipFinder — поиск клиентов для монтажёра</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="app.js"></script>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar">
-    <div class="logo"><div class="logo-icon">E</div><span>EditFind</span></div>
-    <nav class="navigation">
-      <p class="nav-label">WORKSPACE</p>
-      <button class="nav-item active"><span>⌂</span>Dashboard</button>
-      <button class="nav-item"><span>⌕</span>Find clients</button>
-      <button class="nav-item"><span>◉</span>Leads <span class="nav-count">24</span></button>
-      <button class="nav-item"><span>✉</span>Outreach</button>
-      <p class="nav-label second">ANALYTICS</p>
-      <button class="nav-item"><span>↗</span>Analytics</button>
-      <button class="nav-item"><span>⚙</span>Settings</button>
-    </nav>
-    <div class="sidebar-bottom">
-      <div class="upgrade-card">
-        <div class="upgrade-icon">✦</div>
-        <strong>Go Pro</strong>
-        <p>Find more clients with unlimited searches.</p>
-        <button>Upgrade →</button>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#overview" aria-label="ClipFinder — главная">
+        <span class="brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5.5 18.5 12 6 18.5z" fill="currentColor"/><path d="M4 3.5h16v17H4z" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".45"/></svg></span>
+        <span class="brand-name">clipfinder<span class="brand-dot">.</span></span>
+      </a>
+      <div class="workspace-label">РАБОЧЕЕ ПРОСТРАНСТВО</div>
+      <nav class="nav-list" aria-label="Главная навигация">
+        <button class="nav-item active" data-view="overview"><span class="nav-icon">⌂</span><span>Обзор</span></button>
+        <button class="nav-item" data-view="search"><span class="nav-icon">⌕</span><span>Поиск клиентов</span><span class="nav-pill">API</span></button>
+        <button class="nav-item" data-view="saved"><span class="nav-icon">♡</span><span>Сохранённые</span><span class="nav-count" id="sidebarSavedCount">0</span></button>
+        <button class="nav-item" data-view="templates"><span class="nav-icon">☷</span><span>Сообщения</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="plan-card">
+          <div class="plan-icon">✦</div>
+          <div class="plan-title">Твой поиск — на старте</div>
+          <p>Подключи поисковый API, чтобы находить свежие результаты из интернета.</p>
+          <button class="text-action" data-view="settings">Настроить поиск <span>↗</span></button>
+        </div>
+        <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span><span>Настройки</span></button>
+        <div class="profile-row">
+          <div class="avatar">М</div>
+          <div class="profile-copy"><strong>Мой профиль</strong><span>Видеомонтажёр</span></div>
+          <span class="profile-menu">···</span>
+        </div>
       </div>
-      <div class="user"><div class="avatar">A</div><div><strong>Alexander</strong><small>Free plan</small></div><span class="dots">•••</span></div>
-    </div>
-  </aside>
+    </aside>
 
-  <main class="main">
-    <header class="topbar">
-      <div class="mobile-logo"><div class="logo-icon">E</div>EditFind</div>
-      <div class="topbar-right"><button class="icon-button">?</button><button class="notification">♢<span></span></button><div class="top-avatar">A</div></div>
-    </header>
-
-    <section class="content">
-      <div class="welcome">
-        <div>
-          <p class="eyebrow">CLIENT FINDER</p>
-          <h1>Find your next <span>client.</span></h1>
-          <p class="subtitle">Let EditFind discover creators and businesses that need a video editor.</p>
+    <main class="main-area">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="Открыть меню">☰</button>
+        <div class="breadcrumbs"><span>Рабочее пространство</span><span class="crumb-slash">/</span><strong id="currentCrumb">Обзор</strong></div>
+        <div class="topbar-right">
+          <div class="mode-indicator"><span class="status-dot"></span><span id="modeLabel">Демо-режим</span></div>
+          <button class="icon-button theme-toggle" id="themeToggle" aria-label="Переключить тему" title="Переключить тему">☀</button><button class="icon-button" data-view="settings" aria-label="Настройки" title="Настройки">⚙</button>
+          <div class="avatar avatar-small">М</div>
         </div>
-        <div class="live-status"><span class="live-dot"></span>Autopilot is ready</div>
-      </div>
+      </header>
 
-      <section class="search-card">
-        <div class="search-card-header">
-          <div><h2>Find potential clients</h2><p>Tell us who you want to work with.</p></div>
-          <div class="ai-badge">✦ AI powered</div>
+      <section class="view active" id="view-overview">
+        <div class="welcome-row">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-line"></span> ТВОЯ ПОИСКОВАЯ СТАНЦИЯ</div>
+            <h1>Меньше поиска.<br /><span>Больше монтажа.</span></h1>
+            <p class="welcome-sub">Находи авторов и команды, которым может понадобиться твой монтаж.</p>
+          </div>
+          <div class="date-chip"><span class="calendar-icon">◷</span><span id="todayDate">Сегодня</span></div>
         </div>
-        <div class="filters">
-          <div class="filter"><label>CLIENT TYPE</label><select id="clientType"><option>YouTube creators</option><option>Podcasters</option><option>Businesses</option><option>Coaches</option></select></div>
-          <div class="filter"><label>MIN. AUDIENCE</label><select><option>10,000+</option><option>50,000+</option><option>100,000+</option></select></div>
-          <div class="filter"><label>LANGUAGE</label><select><option>English</option><option>German</option><option>Russian</option><option>Spanish</option></select></div>
-          <button class="search-button" id="searchButton"><span>⌕</span>Find clients</button>
+
+        <div class="search-panel" id="quickSearchPanel">
+          <div class="panel-heading">
+            <div class="sparkle-icon">✳</div>
+            <div><h2>Кого будем искать?</h2><p>Опиши нишу или оставь поле пустым для общего поиска.</p></div>
+          </div>
+          <form id="searchForm" class="search-form">
+            <label class="search-input-wrap" for="searchQuery"><span class="input-search-icon">⌕</span><input id="searchQuery" type="text" autocomplete="off" placeholder="Например, фитнес-блогеры, подкасты, эксперты…" /><kbd>↵</kbd></label>
+            <div class="search-controls">
+              <label class="select-wrap"><span class="field-caption">ТИП КЛИЕНТОВ</span><select id="clientType"><option value="all">Все типы</option><option value="bloggers">Блогеры и авторы</option><option value="podcasts">Подкасты</option><option value="experts">Эксперты</option><option value="business">Бизнес</option></select></label>
+              <label class="select-wrap"><span class="field-caption">ПЛАТФОРМА</span><select id="platform"><option value="all">Все платформы</option><option value="youtube">YouTube</option><option value="instagram">Instagram / Reels</option><option value="tiktok">TikTok</option><option value="telegram">Telegram</option><option value="web">Сайты и сообщества</option></select></label>
+              <label class="select-wrap"><span class="field-caption">ЯЗЫК</span><select id="language"><option value="ru">Русский</option><option value="en">Английский</option><option value="any">Любой</option></select></label>
+              <button class="primary-button" type="submit" id="searchButton"><span class="button-spark">✳</span><span>Найти клиентов</span><span class="button-arrow">↗</span></button>
+            </div>
+            <div class="suggestion-row"><span>Попробуй:</span><button type="button" class="suggestion-chip" data-query="ищу монтажера для YouTube">Ищут монтажёра</button><button type="button" class="suggestion-chip" data-query="авторы подкастов">Авторы подкастов</button><button type="button" class="suggestion-chip" data-query="эксперты для Reels">Эксперты для Reels</button></div>
+          </form>
+          <div class="search-progress hidden" id="searchProgress"><div class="progress-track"><span id="progressBar"></span></div><div class="progress-meta"><span id="progressText">Собираем поисковые запросы…</span><span id="progressPercent">0%</span></div></div>
+        </div>
+
+        <div class="section-title-row"><div><h2>Твоя активность</h2><p>Результаты и лиды в одном месте</p></div><button class="plain-link" data-view="saved">Все сохранённые <span>→</span></button></div>
+        <div class="stats-grid">
+          <article class="stat-card"><div class="stat-top"><span>Найдено лидов</span><span class="stat-icon violet">⌕</span></div><div class="stat-number" id="statFound">—</div><div class="stat-foot"><span class="stat-dash"></span>За текущую сессию</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Сохранено</span><span class="stat-icon peach">♡</span></div><div class="stat-number" id="statSaved">0</div><div class="stat-foot"><span class="stat-dot-muted"></span>В твоём списке</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Сообщения готовы</span><span class="stat-icon blue">↗</span></div><div class="stat-number" id="statMessages">0</div><div class="stat-foot"><span class="stat-dot-muted"></span>Можно отправлять вручную</div></article>
+        </div>
+
+        <div class="section-title-row result-title-row"><div><h2 id="resultsHeading">Подходящие возможности</h2><p id="resultsSubheading">Начни поиск — здесь появятся потенциальные клиенты.</p></div><div class="result-actions"><button class="secondary-button small-button" id="exportButton" disabled>↓ Экспорт CSV</button><button class="secondary-button small-button" data-view="search">Открыть поиск ↗</button></div></div>
+        <div id="resultsArea" class="results-area">
+          <div class="empty-state" id="emptyState"><div class="empty-art"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="empty-magnifier">⌕</div><span class="orbit-star star-one">✳</span><span class="orbit-star star-two">✦</span></div><h3>Твои следующие клиенты — где-то здесь</h3><p>Задай нишу и запусти поиск. Можно сохранить интересные профили и сразу подготовить первое сообщение.</p><button class="primary-button empty-cta" data-view="search">Запустить поиск <span class="button-arrow">↗</span></button></div>
         </div>
       </section>
 
-      <section class="stats">
-        <div class="stat-card"><div class="stat-top"><span>Leads found</span><div class="stat-icon purple">◉</div></div><strong id="leadsFound">247</strong><small><b>+18%</b> this week</small></div>
-        <div class="stat-card"><div class="stat-top"><span>High intent</span><div class="stat-icon green">↗</div></div><strong id="highIntent">34</strong><small><b>+12%</b> this week</small></div>
-        <div class="stat-card"><div class="stat-top"><span>Emails found</span><div class="stat-icon blue">✉</div></div><strong id="emailsFound">18</strong><small><b>+7%</b> this week</small></div>
-        <div class="stat-card"><div class="stat-top"><span>Response rate</span><div class="stat-icon orange">%</div></div><strong>24.8%</strong><small><b>+3.4%</b> this week</small></div>
+      <section class="view" id="view-search">
+        <div class="page-heading"><div class="eyebrow"><span class="eyebrow-line"></span> ПОИСКОВЫЙ ИНСТРУМЕНТ</div><h1>Найди своего <span>следующего клиента.</span></h1><p>Ищи по нише, типу автора и платформе. Сохраняй перспективные контакты.</p></div>
+        <div class="search-panel search-panel-page">
+          <div class="panel-heading"><div class="sparkle-icon">✳</div><div><h2>Настрой поиск</h2><p>Чем точнее ниша, тем релевантнее результаты.</p></div></div>
+          <form id="searchFormPage" class="search-form">
+            <label class="search-input-wrap" for="searchQueryPage"><span class="input-search-icon">⌕</span><input id="searchQueryPage" type="text" autocomplete="off" placeholder="Например, авторы о финансах" /><kbd>↵</kbd></label>
+            <div class="search-controls">
+              <label class="select-wrap"><span class="field-caption">ТИП КЛИЕНТОВ</span><select id="clientTypePage"><option value="all">Все типы</option><option value="bloggers">Блогеры и авторы</option><option value="podcasts">Подкасты</option><option value="experts">Эксперты</option><option value="business">Бизнес</option></select></label>
+              <label class="select-wrap"><span class="field-caption">ПЛАТФОРМА</span><select id="platformPage"><option value="all">Все платформы</option><option value="youtube">YouTube</option><option value="instagram">Instagram / Reels</option><option value="tiktok">TikTok</option><option value="telegram">Telegram</option><option value="web">Сайты и сообщества</option></select></label>
+              <label class="select-wrap"><span class="field-caption">ЯЗЫК</span><select id="languagePage"><option value="ru">Русский</option><option value="en">Английский</option><option value="any">Любой</option></select></label>
+              <button class="primary-button" type="submit" id="searchButtonPage"><span class="button-spark">✳</span><span>Начать поиск</span><span class="button-arrow">↗</span></button>
+            </div>
+            <div class="suggestion-row"><span>Быстрые запросы:</span><button type="button" class="suggestion-chip" data-query="ищу монтажера YouTube">Ищут монтажёра</button><button type="button" class="suggestion-chip" data-query="ведущие подкастов ищут монтажера">Подкасты</button><button type="button" class="suggestion-chip" data-query="бизнесу нужен монтаж Reels">Reels для бизнеса</button></div>
+          </form>
+          <div class="search-progress hidden" id="searchProgressPage"><div class="progress-track"><span id="progressBarPage"></span></div><div class="progress-meta"><span id="progressTextPage">Собираем поисковые запросы…</span><span id="progressPercentPage">0%</span></div></div>
+        </div>
+        <div class="search-tips"><div class="tip-icon">✦</div><div><strong>Совет для лучшего результата</strong><p>Ищи не только тех, кто прямо пишет «ищу монтажёра», но и авторов, которые регулярно выпускают видео. Сначала проверь, подходит ли им твой стиль.</p></div></div>
+        <div class="section-title-row"><div><h2>Результаты поиска</h2><p id="pageResultsMeta">Пока ничего не найдено</p></div><button class="secondary-button small-button" id="exportButtonPage" disabled>↓ Экспорт CSV</button></div>
+        <div class="results-area" id="resultsAreaPage"><div class="empty-inline"><span>⌕</span><div><strong>Здесь будут результаты</strong><p>Запусти поиск, чтобы увидеть потенциальных клиентов.</p></div></div></div>
       </section>
 
-      <section class="leads-section">
-        <div class="section-header"><div><h2>Recommended leads</h2><p>Potential clients matched to your profile.</p></div><button class="view-all">View all →</button></div>
-        <div class="leads-table">
-          <div class="table-head"><span>CLIENT</span><span>PLATFORM</span><span>AUDIENCE</span><span>OPPORTUNITY</span><span>SCORE</span><span></span></div>
-          <div id="leadList"></div>
+      <section class="view" id="view-saved">
+        <div class="page-heading compact-heading"><div class="eyebrow"><span class="eyebrow-line"></span> ТВОЯ БАЗА КОНТАКТОВ</div><h1>Сохранённые <span>клиенты.</span></h1><p>Перспективные контакты, к которым удобно вернуться позже.</p></div>
+        <div class="saved-toolbar"><div class="saved-search"><span>⌕</span><input id="savedFilter" type="search" placeholder="Найти в сохранённых…" /></div><button class="secondary-button small-button" id="exportSavedButton">↓ Экспорт CSV</button></div>
+        <div class="results-area" id="savedResultsArea"></div>
+      </section>
+
+      <section class="view" id="view-templates">
+        <div class="page-heading compact-heading"><div class="eyebrow"><span class="eyebrow-line"></span> ПЕРВОЕ КАСАНИЕ</div><h1>Сообщения без <span>неловкости.</span></h1><p>Персонализируй шаблон под автора и скопируй. Отправка остаётся под твоим контролем.</p></div>
+        <div class="template-layout">
+          <div class="template-list">
+            <button class="template-choice active" data-template="warm"><span class="template-choice-icon">✦</span><span><strong>Дружелюбное знакомство</strong><small>Для авторов и блогеров</small></span><span class="template-check">✓</span></button>
+            <button class="template-choice" data-template="specific"><span class="template-choice-icon">↗</span><span><strong>С конкретным предложением</strong><small>Когда заметил потенциал</small></span><span class="template-check">✓</span></button>
+            <button class="template-choice" data-template="short"><span class="template-choice-icon">✉</span><span><strong>Короткое сообщение</strong><small>Для первого контакта</small></span><span class="template-check">✓</span></button>
+          </div>
+          <div class="template-editor"><div class="template-editor-head"><div><span class="mini-label">РЕДАКТОР ШАБЛОНА</span><h2 id="templateTitle">Дружелюбное знакомство</h2></div><span class="live-badge"><span></span> Редактируется</span></div><div class="template-fields"><label>Имя автора<input id="templateName" placeholder="Например, Алексей" value="" /></label><label>Что понравилось в контенте<input id="templateDetail" placeholder="Например, разборы про бизнес" value="" /></label></div><label class="message-label" for="templateMessage">Текст сообщения</label><textarea id="templateMessage" rows="8"></textarea><div class="template-editor-footer"><span><span class="personalize-icon">✳</span> Переменные подставляются автоматически</span><button class="primary-button" id="copyTemplateButton">Скопировать текст <span>↗</span></button></div><p class="inline-feedback" id="templateFeedback" aria-live="polite"></p></div>
         </div>
       </section>
-    </section>
-  </main>
-</div>
 
-<div class="modal" id="scanModal">
-  <div class="modal-box">
-    <button class="close-modal" id="closeModal">×</button>
-    <div class="scan-icon">✦</div>
-    <h2 id="scanTitle">Finding clients...</h2>
-    <p id="scanText">Scanning the web for potential clients.</p>
-    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
-    <div class="scan-percent"><span id="progressPercent">0%</span><span>AI search</span></div>
-    <div class="scan-steps">
-      <div class="scan-step active"><span>✓</span>Searching creators</div>
-      <div class="scan-step"><span>○</span>Analyzing activity</div>
-      <div class="scan-step"><span>○</span>Finding editing opportunities</div>
-      <div class="scan-step"><span>○</span>Ranking leads</div>
-    </div>
+      <section class="view" id="view-settings">
+        <div class="page-heading compact-heading"><div class="eyebrow"><span class="eyebrow-line"></span> ПОДКЛЮЧЕНИЯ</div><h1>Настрой поиск <span>под себя.</span></h1><p>Подключи источник реальных поисковых результатов или используй демо-режим.</p></div>
+        <div class="settings-grid">
+          <div class="settings-card"><div class="settings-card-heading"><div class="settings-symbol">⌕</div><div><h2>Поиск в интернете</h2><p>Подключение через SerpAPI</p></div><span class="settings-state" id="apiStatusBadge">Не подключён</span></div><div class="settings-content"><p>Сайт отправляет запросы к поисковому API и показывает публичные страницы с заголовком, ссылкой и описанием. Не используем скрытый сбор данных из закрытых аккаунтов.</p><div class="api-howto"><strong>Как включить реальный поиск</strong><ol><li>Создай ключ на <a href="https://serpapi.com/" target="_blank" rel="noreferrer">serpapi.com</a>.</li><li>Открой файл <code>.env</code> в папке проекта.</li><li>Добавь строку <code>SERPAPI_KEY=твой_ключ</code> и перезапусти сервер.</li></ol></div><div class="settings-note"><span>ⓘ</span><p>Без ключа поиск работает в демо-режиме на примерах. Демо-результаты помечены и не являются реальными заявками.</p></div><button class="secondary-button" id="testConnectionButton">Проверить подключение</button><span class="connection-feedback" id="connectionFeedback" aria-live="polite"></span></div></div>
+          <div class="settings-card"><div class="settings-card-heading"><div class="settings-symbol settings-symbol-purple">♡</div><div><h2>Твоя база клиентов</h2><p>Данные сохраняются в браузере</p></div></div><div class="settings-content"><div class="setting-row"><div><strong>Сохранённые лиды</strong><span>Локальное хранилище этого браузера</span></div><strong id="settingsSavedCount">0</strong></div><div class="setting-row"><div><strong>Подготовленные сообщения</strong><span>Число сообщений, скопированных из шаблонов</span></div><strong id="settingsMessagesCount">0</strong></div><button class="danger-button" id="clearSavedButton">Очистить сохранённые данные</button><span class="connection-feedback" id="clearFeedback" aria-live="polite"></span></div></div>
+          <div class="settings-card wide-settings-card"><div class="settings-card-heading"><div class="settings-symbol settings-symbol-blue">✧</div><div><h2>Что умеет ClipFinder</h2><p>Функции этой версии</p></div></div><div class="features-list"><div><span>✓</span><p><strong>Поиск по запросу и нише</strong><small>Через подключённый поисковый API или в демо-режиме.</small></p></div><div><span>✓</span><p><strong>Сохранение и фильтрация лидов</strong><small>Можно продолжить работу после перезагрузки страницы.</small></p></div><div><span>✓</span><p><strong>Сообщения и экспорт CSV</strong><small>Подготовка первого контакта и выгрузка списка.</small></p></div><div><span>—</span><p><strong>Автоматическая отправка сообщений</strong><small>Не включена: каждое обращение ты проверяешь и отправляешь сам.</small></p></div></div></div>
+        </div>
+      </section>
+
+      <footer class="app-footer"><span>clipfinder<span class="brand-dot">.</span></span><span>Создан для тех, кто создаёт видео <span class="footer-heart">♥</span></span><span class="footer-version">Версия 1.0</span></footer>
+    </main>
   </div>
-</div>
-
-<div class="modal" id="leadModal">
-  <div class="lead-modal"><button class="close-modal" id="closeLeadModal">×</button><div id="leadDetails"></div></div>
-</div>
-<script src="script.js"></script>
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+  <div class="modal-backdrop hidden" id="leadModalBackdrop" role="presentation"><section class="lead-modal" role="dialog" aria-modal="true" aria-labelledby="leadModalTitle"><button class="modal-close" id="closeLeadModal" aria-label="Закрыть">×</button><div id="leadModalContent"></div></section></div>
 </body>
 </html>
